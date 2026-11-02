@@ -82,6 +82,38 @@
       "approved_wording": "Most merchants go live in under two weeks.",
       "conditions": "'One day' applies only to the Shopify plugin and must say so.",
       "evidence": "Onboarding data, 2026"
+    },
+    {
+      "id": "BC-011",
+      "claim": "Brightcart hosts the payment fields so storefront apps never handle card data",
+      "status": "approved",
+      "approved_wording": "Brightcart hosts the payment fields itself, so storefront apps and scripts never handle card data.",
+      "conditions": "Messaging statement. Do not say this makes card skimming impossible.",
+      "evidence": "Architecture review, security team, 2026"
+    },
+    {
+      "id": "BC-012",
+      "claim": "Every Brightcart transaction is scored for fraud risk",
+      "status": "approved",
+      "approved_wording": "Every Brightcart transaction is scored for fraud risk before it is authorised.",
+      "conditions": "Messaging statement. Do not imply all fraud is stopped.",
+      "evidence": "Product documentation, risk scoring"
+    },
+    {
+      "id": "BC-013",
+      "claim": "Brightcart one-page checkout removes extra steps between cart and payment",
+      "status": "approved",
+      "approved_wording": "Brightcart's one-page checkout puts cart, delivery and payment on a single page, with no forced account creation.",
+      "conditions": "Messaging statement.",
+      "evidence": "Product documentation, checkout"
+    },
+    {
+      "id": "BC-014",
+      "claim": "Brightcart replaces several payment integrations with one",
+      "status": "approved",
+      "approved_wording": "Brightcart brings checkout, payment methods and risk scoring into one integration.",
+      "conditions": "Messaging statement. Do not name the providers it replaces.",
+      "evidence": "Product documentation"
     }
   ]
 }

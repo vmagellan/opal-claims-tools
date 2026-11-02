@@ -39,7 +39,7 @@ Batching matters: inside an Opal workflow, tool calls run one after another, so 
 ## How it works
 
 - Built with the official [`@optimizely-opal/opal-tools-sdk`](https://www.npmjs.com/package/@optimizely-opal/opal-tools-sdk) on Express. The SDK generates `GET /discovery` and `POST /tools/check-claims-register`.
-- Both tools read [`src/data/claims-register.json`](src/data/claims-register.json): ten entries plus a banned-terms list. In a real deployment the lookup in [`src/register.ts`](src/register.ts) would read the customer's own system (Airtable, SharePoint, a claims database) and nothing in the Opal agents would change.
+- Both tools read [`src/data/claims-register.json`](src/data/claims-register.json): fourteen entries (ten product claims and four approved messaging statements) plus a banned-terms list. In a real deployment the lookup in [`src/register.ts`](src/register.ts) would read the customer's own system (Airtable, SharePoint, a claims database) and nothing in the Opal agents would change.
 - Matching is keyword overlap with a threshold, plus a banned-term scan. It is deliberately simple and deterministic: the same claim always gets the same verdict.
 - `/tools/*` requires a bearer token (`TOOLS_BEARER_TOKEN`) via the SDK's `static_token` auth mode. `/discovery` stays public so Opal can register the tool.
 
