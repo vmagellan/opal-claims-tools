@@ -1,0 +1,87 @@
+{
+  "company": "Brightcart",
+  "description": "Fictional checkout and payments SaaS for mid-market e-commerce brands. Register maintained by Legal; last reviewed 2026-10-15.",
+  "banned_terms": ["guaranteed", "guarantee", "fastest", "#1", "number one", "best in class", "risk-free", "never fails", "100% secure"],
+  "claims": [
+    {
+      "id": "BC-001",
+      "claim": "Brightcart reduces checkout time by 30%",
+      "status": "approved",
+      "approved_wording": "Up to 30% faster checkout, based on Brightcart internal tests (2026).",
+      "conditions": "Must include 'up to' and the footnote source.",
+      "evidence": "Internal A/B test, 42 merchants, Q2 2026"
+    },
+    {
+      "id": "BC-002",
+      "claim": "Brightcart increases conversion rate",
+      "status": "approved",
+      "approved_wording": "Merchants saw an average 8% lift in checkout conversion after switching to Brightcart.",
+      "conditions": "Always state 'average' and '8%'. Never round up.",
+      "evidence": "Customer cohort analysis, 120 merchants, 2025"
+    },
+    {
+      "id": "BC-003",
+      "claim": "Brightcart is PCI DSS compliant",
+      "status": "approved",
+      "approved_wording": "Brightcart is PCI DSS Level 1 certified.",
+      "conditions": "None.",
+      "evidence": "PCI DSS v4.0 Attestation of Compliance, valid to 2027-03"
+    },
+    {
+      "id": "BC-004",
+      "claim": "Brightcart supports 40 payment methods",
+      "status": "approved",
+      "approved_wording": "Brightcart supports more than 40 payment methods across 25 countries.",
+      "conditions": "Recheck count quarterly.",
+      "evidence": "Product catalogue, October 2026"
+    },
+    {
+      "id": "BC-005",
+      "claim": "Brightcart has 99.99% uptime",
+      "status": "restricted",
+      "approved_wording": "Brightcart targets 99.95% uptime under its standard SLA.",
+      "conditions": "99.99% is the Enterprise SLA only and may not be used in general marketing.",
+      "evidence": "Standard SLA v3; Enterprise SLA v3"
+    },
+    {
+      "id": "BC-006",
+      "claim": "Brightcart eliminates fraud",
+      "status": "banned",
+      "approved_wording": "Brightcart helps reduce fraudulent transactions with built-in risk scoring.",
+      "conditions": "Never claim fraud is eliminated or prevented entirely.",
+      "evidence": "Legal ruling LR-2025-11"
+    },
+    {
+      "id": "BC-007",
+      "claim": "Brightcart is trusted by 500 brands",
+      "status": "approved",
+      "approved_wording": "Trusted by more than 500 e-commerce brands.",
+      "conditions": "Only 'more than 500'. Do not name customers without written consent.",
+      "evidence": "Active merchant count, September 2026"
+    },
+    {
+      "id": "BC-008",
+      "claim": "Brightcart integrates with Optimizely Commerce",
+      "status": "approved",
+      "approved_wording": "Brightcart offers a native integration with Optimizely Commerce.",
+      "conditions": "None.",
+      "evidence": "Integration listing, partner portal"
+    },
+    {
+      "id": "BC-009",
+      "claim": "Brightcart cuts cart abandonment in half",
+      "status": "banned",
+      "approved_wording": "Brightcart's one-page checkout is designed to reduce cart abandonment.",
+      "conditions": "No numeric claim on abandonment is substantiated.",
+      "evidence": "None"
+    },
+    {
+      "id": "BC-010",
+      "claim": "Brightcart setup takes one day",
+      "status": "restricted",
+      "approved_wording": "Most merchants go live in under two weeks.",
+      "conditions": "'One day' applies only to the Shopify plugin and must say so.",
+      "evidence": "Onboarding data, 2026"
+    }
+  ]
+}
