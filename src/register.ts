@@ -34,7 +34,7 @@ function figures(text: string): string[] {
   return (text.match(/\d[\d,]*(?:\.\d+)?%?/g) ?? []).map((n) => n.replace(/,/g, ""));
 }
 
-const round = (n: number) => Math.round(n * 100) / 100;
+const sameText = (a: string, b: string) => normalise(a).toLowerCase() === normalise(b).toLowerCase();
 
 export async function checkClaims(claims: string[] | string) {
   const list = [...new Set((Array.isArray(claims) ? claims : String(claims).split(/\n+/)).map(normalise).filter(Boolean))];
@@ -64,27 +64,42 @@ export async function checkClaims(claims: string[] | string) {
     )
       flags.push(`closest entry ${top.entry.id} is ${top.entry.status}: ${top.entry.conditions}`);
 
+    const exact = register.claims.find((e) => sameText(claim, e.approved_wording));
+    if (exact && !flags.length) return { claim, decision: "ok", register_id: exact.id };
+
+    if (flags.length) {
+      const replacement = ranked.slice(0, TOP_K).find((r) => r.entry.status === "approved") ?? ranked.find((r) => r.toWording >= USES_APPROVED_WORDING);
+      return {
+        claim,
+        decision: "do_not_use",
+        flags,
+        use_instead: replacement ? { register_id: replacement.entry.id, approved_wording: replacement.entry.approved_wording } : null,
+      };
+    }
+
+    // Only one candidate when it clearly stands out; otherwise the agent compares up to three.
+    const shown = ranked[0].similarity - ranked[1].similarity >= CLEARLY_CLOSER ? ranked.slice(0, 1) : ranked.slice(0, TOP_K);
     return {
       claim,
-      flags,
-      decision: flags.length ? "do_not_use" : "agent_judges",
-      candidates: ranked.slice(0, TOP_K).map((r) => ({
+      decision: "agent_judges",
+      candidates: shown.map((r) => ({
         register_id: r.entry.id,
-        status: r.entry.status,
         approved_wording: r.entry.approved_wording,
-        conditions: r.entry.conditions,
-        similarity: round(r.similarity),
+        ...(r.entry.status !== "approved" && { status: r.entry.status }),
+        ...(r.entry.conditions !== "None." && { conditions: r.entry.conditions }),
       })),
     };
   });
 
+  const count = (d: string) => results.filter((r) => r.decision === d).length;
   return {
-    company: register.company,
     checked: results.length,
-    flagged: results.filter((r) => r.flags.length).length,
+    ok: count("ok"),
+    do_not_use: count("do_not_use"),
+    agent_judges: count("agent_judges"),
     results,
     guidance:
-      "decision do_not_use: the claim must not appear as written; replace it with a candidate's approved_wording or remove it. decision agent_judges: keep the claim only if it says the same thing as one candidate's approved_wording, adds nothing to it, and meets that candidate's conditions; otherwise replace or remove it. Similarity only says which entries are related, never that a claim is approved.",
+      "ok: exact approved wording, keep it. do_not_use: never use as written; use use_instead or remove it. agent_judges: keep only if it says the same as a candidate's approved_wording, adds nothing and meets its conditions; otherwise replace or remove.",
   };
 }
 
