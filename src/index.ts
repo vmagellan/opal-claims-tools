@@ -27,11 +27,11 @@ registerTool(
   "check_claims_register",
   {
     description:
-      "Checks a list of marketing claims Brightcart makes about itself (product, performance, security, fraud, uptime, customers, integrations, setup time) against the legal-approved claims register, in one call. For each claim returns status approved, needs_rewording, restricted, banned or not_found, the register ID, the approved wording to use instead, and the reason (including figures that differ from the approved wording). Send every distinct claim in a single call. Do not use it for news or market facts; those are checked against their source.",
+      "Checks a list of claims Brightcart makes about itself (product, performance, security, fraud, uptime, customers, integrations, setup time) against the legal-approved claims register, in one call. For each claim it retrieves the 3 most similar register entries by meaning (approved wording, status, conditions, similarity) and raises hard flags code can verify: banned terms, absolute wording, figures not in the approved wording, and restricted or banned entries. A flagged claim must not be used as written. For an unflagged claim, you judge whether it says the same thing as a candidate's approved wording and meets its conditions. Send every distinct claim, including headlines, in a single call. Do not use it for news or market facts.",
     inputSchema: {
       claims: z
         .array(z.string())
-        .describe("Every distinct Brightcart claim, one full sentence each, exactly as written in the draft."),
+        .describe("Every distinct Brightcart claim in the draft, one full sentence or headline each, exactly as written."),
     },
   },
   async ({ claims }) => checkClaims(claims),

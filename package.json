@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "Custom Opal tools: claims register lookup and Exa evidence search",
   "dependencies": {
+    "@huggingface/transformers": "^4.3.2",
     "@optimizely-opal/opal-tools-sdk": "^0.1.41-dev",
     "axios": "^1.21.0",
     "express": "^4.22.3",

@@ -1,0 +1,41 @@
+[
+  {"claim": "Up to 30% faster checkout, based on Brightcart internal tests (2026).", "entry": "BC-001", "verdict": "ok", "kind": "exact"},
+  {"claim": "Brightcart supports more than 40 payment methods across 25 countries.", "entry": "BC-004", "verdict": "ok", "kind": "exact"},
+  {"claim": "Every Brightcart transaction is scored for fraud risk before it is authorised.", "entry": "BC-012", "verdict": "ok", "kind": "exact"},
+  {"claim": "Brightcart's one-page checkout puts cart, delivery and payment on a single page, with no forced account creation.", "entry": "BC-013", "verdict": "ok", "kind": "exact"},
+  {"claim": "Most merchants go live in under two weeks.", "entry": "BC-010", "verdict": "ok", "kind": "exact"},
+
+  {"claim": "Checkout gets up to 30% faster with Brightcart, according to our internal testing.", "entry": "BC-001", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "Shoppers pay on one page and never have to create an account.", "entry": "BC-013", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "Card details never touch your storefront apps, because Brightcart hosts the payment fields.", "entry": "BC-011", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "We assess the fraud risk of each payment before it is approved.", "entry": "BC-012", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "One integration covers your checkout, payment methods and fraud scoring.", "entry": "BC-014", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "Accept over 40 ways to pay in 25 markets.", "entry": "BC-004", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "Brightcart holds PCI DSS Level 1 certification.", "entry": "BC-003", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "More than 500 online brands trust Brightcart.", "entry": "BC-007", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "Brightcart connects natively to Optimizely Commerce.", "entry": "BC-008", "verdict": "ok", "kind": "paraphrase"},
+  {"claim": "On average, merchants convert 8% more checkouts after moving to Brightcart.", "entry": "BC-002", "verdict": "ok", "kind": "paraphrase"},
+
+  {"claim": "Lift conversion by 8%.", "entry": "BC-002", "verdict": "fix", "kind": "condition", "why": "BC-002 requires 'average'"},
+  {"claim": "Brightcart increases checkout conversion by 15%.", "entry": "BC-002", "verdict": "fix", "kind": "wrong_figure"},
+  {"claim": "Make your checkout 50% faster.", "entry": "BC-001", "verdict": "fix", "kind": "wrong_figure"},
+  {"claim": "Over 1,000 brands trust Brightcart.", "entry": "BC-007", "verdict": "fix", "kind": "wrong_figure"},
+  {"claim": "Brightcart supports 60 payment methods.", "entry": "BC-004", "verdict": "fix", "kind": "wrong_figure"},
+  {"claim": "Brightcart has 99.99% uptime.", "entry": "BC-005", "verdict": "fix", "kind": "restricted"},
+  {"claim": "Go live with Brightcart in one day.", "entry": "BC-010", "verdict": "fix", "kind": "restricted", "why": "one day only for the Shopify plugin"},
+  {"claim": "Brightcart checkout is 30% faster.", "entry": "BC-001", "verdict": "fix", "kind": "condition", "why": "BC-001 requires 'up to' and the source"},
+
+  {"claim": "Brightcart eliminates fraud.", "entry": "BC-006", "verdict": "blocked", "kind": "banned"},
+  {"claim": "Fraud is a thing of the past with Brightcart.", "entry": "BC-006", "verdict": "blocked", "kind": "banned_paraphrase"},
+  {"claim": "Brightcart cuts cart abandonment in half.", "entry": "BC-009", "verdict": "blocked", "kind": "banned"},
+  {"claim": "Halve your abandoned carts with Brightcart.", "entry": "BC-009", "verdict": "blocked", "kind": "banned_paraphrase"},
+  {"claim": "The fastest checkout on the market.", "entry": "BC-001", "verdict": "blocked", "kind": "banned_term"},
+  {"claim": "Brightcart guarantees approval of every payment.", "entry": null, "verdict": "blocked", "kind": "banned_term"},
+
+  {"claim": "Brightcart provides network token vaulting.", "entry": null, "verdict": "blocked", "kind": "invented"},
+  {"claim": "Smart routing retries soft declines automatically.", "entry": null, "verdict": "blocked", "kind": "invented"},
+  {"claim": "Brightcart integrates with 10 payment gateways.", "entry": null, "verdict": "blocked", "kind": "invented"},
+  {"claim": "Brightcart personalises checkout with AI.", "entry": null, "verdict": "blocked", "kind": "invented"},
+  {"claim": "Brightcart reduces chargebacks.", "entry": null, "verdict": "blocked", "kind": "invented"},
+  {"claim": "Dynamic fallbacks switch to local payment methods when a card is declined.", "entry": null, "verdict": "blocked", "kind": "invented"}
+]

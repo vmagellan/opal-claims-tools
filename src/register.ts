@@ -1,12 +1,26 @@
 import register from "./data/claims-register.json";
+import { cosine, embed } from "./embeddings";
 
 type Entry = (typeof register.claims)[number];
 
-const STOPWORDS = new Set(["the", "a", "an", "by", "of", "to", "in", "on", "and", "is", "are", "with", "for", "our", "we", "your", "you", "it", "its", "brightcart", "that", "this", "more", "than", "up"]);
+// Retrieval finds the closest register entries by meaning; the agent judges whether the draft says the same thing.
+// Flags are the part code can decide on its own, and the agent may never override them.
+const TOP_K = 3;
+// A claim this close to an entry's approved wording is using that wording, so the entry's status does not count against it.
+const USES_APPROVED_WORDING = 0.9;
+// A restricted or banned entry only flags the claim when it is clearly closer than the best approved entry.
+const CLEARLY_CLOSER = 0.05;
+const ABSOLUTES = ["eliminate", "impossible", "zero", "100%", "every payment", "all fraud", "thing of the past", "completely", "entirely"];
 
-// Approved entries need this much overlap to count as the same claim; below it, a match only means "related".
-const MATCH = 0.75;
-const RELATED = 0.5;
+let index: Promise<{ entry: Entry; topic: number[]; wording: number[] }[]> | undefined;
+
+function buildIndex() {
+  index ??= (async () => {
+    const vectors = await embed(register.claims.flatMap((e) => [e.claim, e.approved_wording]));
+    return register.claims.map((entry, i) => ({ entry, topic: vectors[2 * i], wording: vectors[2 * i + 1] }));
+  })();
+  return index;
+}
 
 function normalise(claim: string): string {
   return claim
@@ -16,92 +30,61 @@ function normalise(claim: string): string {
     .replace(/^["'“”]+|["'“”]+$/g, "");
 }
 
-function tokens(text: string): Set<string> {
-  return new Set(
-    text
-      .toLowerCase()
-      .replace(/[^a-z0-9%.#\s]/g, " ")
-      .split(/\s+/)
-      .map((t) => t.replace(/\.$/, ""))
-      .filter((t) => t && !STOPWORDS.has(t)),
-  );
+function figures(text: string): string[] {
+  return (text.match(/\d[\d,]*(?:\.\d+)?%?/g) ?? []).map((n) => n.replace(/,/g, ""));
 }
 
-function overlap(a: string, b: string): number {
-  const ta = tokens(a);
-  const tb = tokens(b);
-  if (!ta.size || !tb.size) return 0;
-  let shared = 0;
-  for (const t of ta) if (tb.has(t)) shared++;
-  return shared / Math.min(ta.size, tb.size);
-}
+const round = (n: number) => Math.round(n * 100) / 100;
 
-function numbers(text: string): string[] {
-  return text.match(/\d+(?:\.\d+)?%?/g) ?? [];
-}
+export async function checkClaims(claims: string[] | string) {
+  const list = [...new Set((Array.isArray(claims) ? claims : String(claims).split(/\n+/)).map(normalise).filter(Boolean))];
+  const entries = await buildIndex();
+  const vectors = list.length ? await embed(list) : [];
 
-function score(claim: string, entry: Entry): number {
-  return Math.round(Math.max(overlap(claim, entry.claim), overlap(claim, entry.approved_wording)) * 100) / 100;
-}
+  const results = list.map((claim, i) => {
+    const ranked = entries
+      .map(({ entry, topic, wording }) => ({ entry, toWording: cosine(vectors[i], wording), similarity: Math.max(cosine(vectors[i], topic), cosine(vectors[i], wording)) }))
+      .sort((a, b) => b.similarity - a.similarity);
+    const top = ranked[0];
+    const lower = claim.toLowerCase();
+    const approved = top.entry.approved_wording.toLowerCase();
 
-export function checkClaim(raw: string) {
-  const claim = normalise(raw);
-  const lower = claim.toLowerCase();
-  const bannedTermsFound = register.banned_terms.filter((term) => lower.includes(term));
+    const flags: string[] = [];
+    const banned = register.banned_terms.filter((t) => lower.includes(t));
+    if (banned.length) flags.push(`banned term: ${banned.join(", ")}`);
+    const absolutes = ABSOLUTES.filter((t) => lower.includes(t) && !approved.includes(t));
+    if (absolutes.length) flags.push(`absolute wording: ${absolutes.join(", ")}`);
+    const extraFigures = figures(claim).filter((n) => !figures(top.entry.approved_wording).includes(n));
+    if (extraFigures.length) flags.push(`figure not in approved wording of ${top.entry.id}: ${extraFigures.join(", ")}`);
+    const bestApproved = ranked.find((r) => r.entry.status === "approved");
+    if (
+      top.entry.status !== "approved" &&
+      top.toWording < USES_APPROVED_WORDING &&
+      top.similarity - (bestApproved?.similarity ?? 0) >= CLEARLY_CLOSER
+    )
+      flags.push(`closest entry ${top.entry.id} is ${top.entry.status}: ${top.entry.conditions}`);
 
-  const ranked = register.claims
-    .map((entry) => ({ entry, match_score: score(claim, entry) }))
-    .filter((m) => m.match_score >= RELATED)
-    .sort((a, b) => b.match_score - a.match_score);
-  const best = ranked[0];
+    return {
+      claim,
+      flags,
+      decision: flags.length ? "do_not_use" : "agent_judges",
+      candidates: ranked.slice(0, TOP_K).map((r) => ({
+        register_id: r.entry.id,
+        status: r.entry.status,
+        approved_wording: r.entry.approved_wording,
+        conditions: r.entry.conditions,
+        similarity: round(r.similarity),
+      })),
+    };
+  });
 
-  let status: string;
-  let reason: string;
-  if (bannedTermsFound.length) {
-    status = "banned";
-    reason = `Contains banned term(s): ${bannedTermsFound.join(", ")}.`;
-  } else if (!best) {
-    status = "not_found";
-    reason = "No register entry covers this claim. It is unsubstantiated and cannot be used.";
-  } else if (best.entry.status !== "approved") {
-    status = best.entry.status;
-    reason = best.entry.conditions;
-  } else if (best.match_score < MATCH) {
-    status = "needs_rewording";
-    reason = `Only partly covered by ${best.entry.id}. Use its approved wording instead.`;
-  } else {
-    const allowed = numbers(best.entry.approved_wording);
-    const unapproved = numbers(claim).filter((n) => !allowed.includes(n));
-    if (unapproved.length) {
-      status = "needs_rewording";
-      reason = `Figure(s) ${unapproved.join(", ")} are not in the approved wording of ${best.entry.id}.`;
-    } else {
-      status = "approved";
-      reason = best.entry.conditions;
-    }
-  }
-
-  return {
-    claim,
-    status,
-    reason,
-    register_id: best?.entry.id ?? null,
-    approved_wording: best?.entry.approved_wording ?? null,
-    match_score: best?.match_score ?? 0,
-    banned_terms_found: bannedTermsFound,
-  };
-}
-
-export function checkClaims(claims: string[] | string) {
-  const list = (Array.isArray(claims) ? claims : String(claims).split(/\n+/)).map(normalise).filter(Boolean);
-  const results = [...new Set(list)].map(checkClaim);
   return {
     company: register.company,
     checked: results.length,
-    all_approved: results.every((r) => r.status === "approved"),
+    flagged: results.filter((r) => r.flags.length).length,
     results,
     guidance:
-      "Use a claim only if its status is approved. For needs_rewording, restricted or banned, replace it with approved_wording verbatim. For not_found, remove it.",
+      "decision do_not_use: the claim must not appear as written; replace it with a candidate's approved_wording or remove it. decision agent_judges: keep the claim only if it says the same thing as one candidate's approved_wording, adds nothing to it, and meets that candidate's conditions; otherwise replace or remove it. Similarity only says which entries are related, never that a claim is approved.",
   };
 }
 
